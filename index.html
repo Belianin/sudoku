@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Sudoku</title>
+    </head>
+    <body>
+        <div style="width: 100vw; height: 100vh">
+            <canvas id="game-canvas" style="margin-left: auto; margin-right: auto; display: block"></canvas>
+        </div>
+        <script>
+            const field = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [2, 3, 4, 5, 6, 7, 8, 9, 1],
+                [3, 4, 5, 6, 7, 8, 9, 1, 2],
+                [4, 5, 6, 7, 8, 9, 1, 2, 3],
+                [5, 6, 7, 8, 9, 1, 2, 3, 4],
+                [6, 7, 8, 9, 1, 2, 3, 4, 5],
+                [7, 8, 9, 1, 2, 3, 4, 5, 6],
+                [8, 9, 1, 2, 3, 4, 5, 6, 7],
+                [9, 1, 2, 3, 4, 5, 6, 7, 8],
+            ]
+
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext("2d");
+            const cellSize = 48;
+            const fieldSize = cellSize * 9;
+            canvas.width = fieldSize;
+            canvas.height = fieldSize;
+
+            ctx.font = '18px Arial';
+
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(0, 0, fieldSize, fieldSize);
+
+            ctx.fillStyle = "black";
+            for (let y = 0; y < 9; y++) {
+                ctx.fillStyle = "gray";
+                ctx.fillRect(0, y * cellSize, fieldSize, 1);
+                ctx.fillRect(y * cellSize, 0, 1, fieldSize);
+
+                ctx.fillStyle = "black";
+                for (let x = 0; x < 9; x++) {
+                    ctx.fillText(field[x][y].toString(), x * cellSize + cellSize / 2, y * cellSize + cellSize / 2)
+                }
+            }
+
+            ctx.fillStyle = "black";
+            for (let i = 0; i < 4; i++) {
+                ctx.fillRect(0, i * 3 * cellSize, fieldSize, 2)
+                ctx.fillRect(i * 3 * cellSize, 0, 2, fieldSize)
+            }
+
+            ctx.fillRect(0, fieldSize - 2, fieldSize, 2)
+            ctx.fillRect(fieldSize - 2, 0, 2, fieldSize)
+
+        </script>
+</body>
+</html>
