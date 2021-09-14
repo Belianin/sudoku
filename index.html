@@ -6,6 +6,7 @@
     </head>
     <body>
         <div style="width: 100vw; height: 100vh">
+            <h3>Canvas</h3>
             <canvas id="game-canvas" style="margin-left: auto; margin-right: auto; display: block"></canvas>
         </div>
         <script>
@@ -21,11 +22,37 @@
                 [9, 1, 2, 3, 4, 5, 6, 7, 8],
             ]
 
-            for (let i = 0; i < 25; i++){
-                swapColumns();
+            const generationFunctions = [
+                swapRows,
+                swapColumns
+            ]
+
+            for (let i = 0; i < 100; i++) {
+                choose(generationFunctions)();
+            }
+            for (let i = 0; i < 60; i++) {
+                const x = getRandomInt(9);
+                const y = getRandomInt(9);
+
+                field[y][x] = null;
             }
 
             let selectedCell;
+            let Hash = getEmptyMatrix();
+
+            function getEmptyMatrix() {
+                return [
+                    [false, false, false, false, false, false, false, false, false],
+                    [false, false, false, false, false, false, false, false, false],
+                    [false, false, false, false, false, false, false, false, false],
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            }
 
             const canvas = document.getElementById('game-canvas');
             const ctx = canvas.getContext("2d");
@@ -34,21 +61,25 @@
             canvas.width = fieldSize;
             canvas.height = fieldSize;
 
-            ctx.font = '18px Arial';
+            ctx.font = '24px Arial';
 
             draw();
+
+            function selectCell(x, y) {
+                selectedCell = {x: x, y: y};
+            }
 
             canvas.addEventListener('click', function(event) {
                 const x = event.pageX - canvas.offsetLeft + canvas.clientLeft,
                     y = event.pageY - canvas.offsetTop + canvas.clientTop;
 
-                selectedCell = {x: Math.floor(x / cellSize), y: Math.floor(y / cellSize)};
+                selectedCell(Math.floor(x / cellSize), Math.floor(y / cellSize));
                 draw();
 
             }, false);
 
             function choose(array) {
-
+                return array[Math.floor(Math.random() * array.length)]
             }
 
             function getRandomInt(max) {
@@ -109,7 +140,8 @@
 
                     ctx.fillStyle = "black";
                     for (let x = 0; x < 9; x++) {
-                        ctx.fillText(field[y][x].toString(), x * cellSize + cellSize / 2, y * cellSize + cellSize / 2)
+                        if (field[y][x])
+                            ctx.fillText(field[y][x].toString(), x * cellSize + cellSize / 2 - 8, y * cellSize + cellSize / 2 + 8)
                     }
                 }
 
