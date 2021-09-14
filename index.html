@@ -30,15 +30,20 @@
             for (let i = 0; i < 100; i++) {
                 choose(generationFunctions)();
             }
-            for (let i = 0; i < 60; i++) {
+            const toDelete = 60;
+            let deleted = 0;
+            while (deleted <= toDelete) {
                 const x = getRandomInt(9);
                 const y = getRandomInt(9);
 
-                field[y][x] = null;
+                if (field[y][x]) {
+                    deleted++;
+                    field[y][x] = null;
+                }
             }
 
             let selectedCell;
-            let Hash = getEmptyMatrix();
+            let highlightedCells = getEmptyMatrix();
 
             function getEmptyMatrix() {
                 return [
@@ -66,14 +71,39 @@
             draw();
 
             function selectCell(x, y) {
+                highlightedCells = getEmptyMatrix();
                 selectedCell = {x: x, y: y};
+                if (!field[y][x])
+                    return;
+
+                highlightedCells[y][x] = true;
+                const value = field[y][x];
+                for (let y = 0; y < 9; y++)
+                    for (let x = 0; x < 9; x++)
+                        if (field[y][x] === value)
+                            highlightCell(x, y);
+
+            }
+
+            function highlightCell(x, y) {
+                const xIndex = Math.floor(x / 3);
+                const yIndex = Math.floor(y / 3);
+
+                for (let i = 0; i < 3; i++)
+                    for (let j = 0; j < 3; j++)
+                        highlightedCells[i + yIndex * 3][j + xIndex * 3] = true;
+
+                for (let i = 0; i < 9; i++)
+                    highlightedCells[y][i] = true;
+                for (let i = 0; i < 9; i++)
+                    highlightedCells[i][x] = true;
             }
 
             canvas.addEventListener('click', function(event) {
                 const x = event.pageX - canvas.offsetLeft + canvas.clientLeft,
                     y = event.pageY - canvas.offsetTop + canvas.clientTop;
 
-                selectedCell(Math.floor(x / cellSize), Math.floor(y / cellSize));
+                selectCell(Math.floor(x / cellSize), Math.floor(y / cellSize));
                 draw();
 
             }, false);
@@ -132,16 +162,24 @@
                     ctx.fillRect(selectedCell.x * cellSize, selectedCell.y * cellSize, cellSize, cellSize);
                 }
 
-                ctx.fillStyle = "black";
                 for (let y = 0; y < 9; y++) {
-                    ctx.fillStyle = "gray";
-                    ctx.fillRect(0, y * cellSize, fieldSize, 1);
-                    ctx.fillRect(y * cellSize, 0, 1, fieldSize);
-
-                    ctx.fillStyle = "black";
                     for (let x = 0; x < 9; x++) {
+                        if (highlightedCells[y][x]) {
+                            ctx.fillStyle = "yellow"
+                            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                        }
+
+                        ctx.fillStyle = "black";
                         if (field[y][x])
                             ctx.fillText(field[y][x].toString(), x * cellSize + cellSize / 2 - 8, y * cellSize + cellSize / 2 + 8)
+                    }
+                }
+
+                ctx.fillStyle = "gray";
+                for (let y = 0; y < 9; y++) {
+                    for (let x = 0; x < 9; x++) {
+                        ctx.fillRect(0, y * cellSize, fieldSize, 1);
+                        ctx.fillRect(y * cellSize, 0, 1, fieldSize);
                     }
                 }
 
@@ -153,6 +191,14 @@
 
                 ctx.fillRect(0, fieldSize - 2, fieldSize, 2);
                 ctx.fillRect(fieldSize - 2, 0, 2, fieldSize);
+
+                if (selectedCell) {
+                    ctx.fillStyle = "red";
+                    ctx.fillRect(selectedCell.x * cellSize, selectedCell.y * cellSize, 2, cellSize);
+                    ctx.fillRect(selectedCell.x * cellSize, selectedCell.y * cellSize, cellSize, 2);
+                    ctx.fillRect((selectedCell.x + 1) * cellSize, selectedCell.y * cellSize, 2, cellSize);
+                    ctx.fillRect(selectedCell.x * cellSize, (selectedCell.y + 1) * cellSize, cellSize, 2);
+                }
             }
         </script>
 </body>
